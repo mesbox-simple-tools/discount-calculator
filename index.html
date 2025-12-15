@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Tính % Discount Tối Ưu Cho Seller</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for professional look and feel */
+        body {
+            /* Áp dụng font Inter cho toàn bộ trang */
+            font-family: 'Inter', sans-serif; 
+            background-color: #f7f9fc;
+        }
+        .card {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+        }
+        .metric-card {
+            border: 1px solid; /* Defined by class colors */
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+            border-radius: 12px; /* Ensure rounded corners */
+        }
+        .metric-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1), 0 4px 6px -4px rgba(99, 102, 241, 0.1);
+        } 
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            transition: all 0.2s;
+            background-color: white;
+        }
+        input[type="number"]:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+        /* Override default metric-card style for specific elements defined in HTML */
+        .metric-card.default {
+            border-color: #e0e7ff;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">
+                💰 Công Cụ Tính % Discount Tối Ưu Cho Seller
+            </h1>
+            <p class="text-lg text-gray-600">
+                Sử dụng template này để tính mức giảm giá Nhanh – Chuẩn – Có Lãi trên các kênh bán hàng online
+            </p>
+        </header>
+
+        <div class="space-y-10">
+
+            <div class="card bg-white p-6 md:p-8">
+                <h2 class="text-xl font-bold text-indigo-700 mb-6 border-b pb-2">
+                    1. NHẬP DỮ LIỆU ĐẦU VÀO ĐỂ TÍNH TOÁN
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="cogs">Giá vốn (COGS) - Đơn vị: VNĐ</label>
+                        <input type="number" id="cogs" value="100000" class="w-full" oninput="calculateProfit()">
+                        <p class="text-xs text-gray-500 mt-1">Giá nhập hàng/sản xuất</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="fixed_cost">Chi phí cố định/Đơn - Đơn vị: VNĐ</label>
+                        <input type="number" id="fixed_cost" value="20000" class="w-full" oninput="calculateProfit()">
+                        <p class="text-xs text-gray-500 mt-1">Lương, mặt bằng (phân bổ)</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="list_price">Giá niêm yết</label>
+                        <input type="number" id="list_price" value="300000" class="w-full" oninput="calculateProfit()">
+                        <p class="text-xs text-gray-500 mt-1">Giá bán hiện tại trên các kênh online</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="target_margin"> Lãi ròng kỳ vọng (%)</label>
+                        <input type="number" id="target_margin" value="30" class="w-full" oninput="calculateProfit()">
+                        <p class="text-xs text-gray-500 mt-1">% lãi ròng kỳ vọng</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-white p-6 md:p-8 overflow-x-auto">
+                <h2 class="text-xl font-bold text-indigo-700 mb-6 border-b pb-2">
+                    2. SO SÁNH VÀ MÔ PHỎNG LÃI RÒNG THEO KÊNH BÁN HÀNG
+                </h2>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr class="text-gray-500 text-left text-sm uppercase tracking-wider bg-gray-50">
+                            <th class="px-3 py-3 font-semibold w-1/4">Chỉ Số</th>
+                            <th class="px-3 py-3 font-semibold w-1/4 text-center">Shopee</th>
+                            <th class="px-3 py-3 font-semibold w-1/4 text-center">TikTok</th>
+                            <th class="px-3 py-3 font-semibold w-1/4 text-center">OWNED CHANNEL</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-sm">
+                        
+                        <tr>
+                            <td class="px-3 py-4 font-medium text-gray-900">Phí sàn / Hoa hồng (%)</td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="fee_a" value="10" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="fee_b" value="2" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="fee_c" value="5" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 font-medium text-gray-900">Chi phí marketing/Đơn (VNĐ)</td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="mkt_a" value="20000" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="mkt_b" value="50000" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="mkt_c" value="0" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 font-medium text-gray-900">Discount áp dụng (%)</td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="discount_a" value="0" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="discount_b" value="0" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                            <td class="px-3 py-2 text-center">
+                                <input type="number" id="discount_c" value="20" class="w-24 text-center" oninput="calculateProfit()">
+                            </td>
+                        </tr>
+
+                        <tr class="bg-indigo-50 font-bold">
+                            <td class="px-3 py-4 text-indigo-700">Giá hoà vốn</td>
+                            <td class="px-3 py-4 text-center" id="bep_a"></td>
+                            <td class="px-3 py-4 text-center" id="bep_b"></td>
+                            <td class="px-3 py-4 text-center" id="bep_c"></td>
+                        </tr>
+                        <tr class="bg-red-50 font-bold">
+                            <td class="px-3 py-4 text-red-700">Mức giá bán lẻ mục tiêu (TSP)</td>
+                            <td class="px-3 py-4 text-center" id="tsp_a"></td>
+                            <td class="px-3 py-4 text-center" id="tsp_b"></td>
+                            <td class="px-3 py-4 text-center" id="tsp_c"></td>
+                        </tr>
+                        <tr class="bg-green-100 font-bold">
+                            <td class="px-3 py-4 text-green-700">Lãi ròng dự kiến/Đơn</td>
+                            <td class="px-3 py-4 text-center" id="net_profit_a"></td>
+                            <td class="px-3 py-4 text-center" id="net_profit_b"></td>
+                            <td class="px-3 py-4 text-center" id="net_profit_c"></td>
+                        </tr>
+                        <tr>
+                             <td class="px-3 py-4 text-gray-900 font-medium">Tỷ lệ lãi ròng dự kiến (%)</td>
+                            <td class="px-3 py-4 text-center" id="net_margin_a"></td>
+                            <td class="px-3 py-4 text-center" id="net_margin_b"></td>
+                            <td class="px-3 py-4 text-center" id="net_margin_c"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="card bg-white p-6 md:p-8">
+                <h2 class="text-xl font-bold text-indigo-700 mb-6 border-b pb-2">
+                    3. MỨC DISCOUNT TỐI ƯU VÀ DỰ BÁO LỢI NHUẬN
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                    
+                    <div id="discount_card_b" class="metric-card p-6 text-center md:col-span-2 bg-green-50 border-green-300">
+                        <p class="text-sm font-semibold text-green-700 mb-2 uppercase">DISCOUNT TỐI ĐA CHO PHÉP TẠI KÊNH RIÊNG</p>
+                        <p class="text-4xl sm:text-5xl font-extrabold text-green-800" id="max_discount_b">0 VNĐ (0%)</p>
+                        <p class="text-base text-gray-600 mt-2">Mức giảm giá tối đa so với Giá niêm yết có thể áp dụng để đạt Lãi ròng kỳ vọng.</p>
+                    </div>
+                    
+                    <div id="alert_card_c" class="metric-card p-6 text-center bg-yellow-50 border-yellow-300">
+                        <p class="text-sm font-semibold text-yellow-700 mb-2">KẾT QUẢ</p>
+                        <p class="text-3xl font-extrabold text-red-600" id="loss_alert">CÓ LÃI</p>
+                        <p class="text-xs text-gray-500 mt-1">Lãi ròng thực tế nếu bán với mức discount mà bạn đưa ra</p>
+                    </div>
+
+                    <div class="metric-card default p-4 text-center md:col-span-1 h-full">
+                        <p class="text-sm font-semibold text-indigo-500 mb-1">LÃI RÒNG CHÊNH LỆCH (Uplift)</p>
+                        <p class="text-3xl font-extrabold text-indigo-700" id="profit_uplift">0 VNĐ</p>
+                        <p class="text-xs text-gray-500 mt-1">Khoản lãi tăng thêm khi kéo 1 đơn hàng từ Sàn về Owned Channel</p>
+                    </div>
+                    
+                    <div class="md:col-span-2 bg-indigo-50 border border-indigo-200 p-6 rounded-lg text-center h-full">
+                        <p class="text-lg font-bold text-indigo-800 mb-3">Tối ưu LÃI RÒNG CHÊNH LỆCH với Mesbox AI!</p>
+                        <p class="text-gray-700 mb-4">
+                            Mức discount tối đa cần được áp dụng một cách linh hoạt và cá nhân hóa cho từng tập khách hàng. <span class="font-semibold">Mesbox AI Agent</span> tự động tư vấn mức giá tối ưu, hỗ trợ chốt đơn với giá trị cao hơn trên Owned Channel, đồng thời sử dụng dữ liệu hành vi của khách hàng để liên tục cải thiện chỉ số Lãi Ròng Chênh Lệch.
+                        </p>
+                        <a href="https://mesbox.com/" class="inline-block px-6 py-3 bg-indigo-600 text-white font-bold rounded-full hover:bg-indigo-700 transition duration-300">
+                            Tìm hiểu về Mesbox AI Agent →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Hàm định dạng tiền tệ Việt Nam (VNĐ)
+        const formatCurrency = (number) => {
+            if (isNaN(number) || number === null) return 'N/A';
+            // Làm tròn đến hàng nghìn gần nhất để dễ đọc
+            const roundedNumber = Math.round(number / 1000) * 1000;
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roundedNumber).replace('₫', ' VNĐ');
+        };
+
+        // Hàm tính toán cốt lõi
+        const calculateProfit = () => {
+            // Lấy dữ liệu Input Trung Tâm
+            const cogs = parseFloat(document.getElementById('cogs').value) || 0;
+            const fixedCost = parseFloat(document.getElementById('fixed_cost').value) || 0;
+            const listPrice = parseFloat(document.getElementById('list_price').value) || 0;
+            // Target Margin Rate phải được chia 100
+            const targetMarginRate = (parseFloat(document.getElementById('target_margin').value) || 0) / 100;
+            
+            // Cài đặt Thuế (Simplification: Fixed 1.5% for all scenarios based on common tax rates for small sellers)
+            // Lưu ý: Thuế là 1.5% dựa trên Doanh thu (Giá bán thực tế)
+            const taxRate = 0.015; 
+
+            // Lấy dữ liệu Biến Đổi Kênh
+            const scenarios = {
+                a: { // Kênh A (Shopee)
+                    fee: (parseFloat(document.getElementById('fee_a').value) || 0) / 100, // Phí sàn/HH (%)
+                    mkt: parseFloat(document.getElementById('mkt_a').value) || 0, // Chi phí MKT (VNĐ)
+                    discount: (parseFloat(document.getElementById('discount_a').value) || 0) / 100 // Discount áp dụng (%)
+                },
+                b: { // Kênh B (TikTok)
+                    fee: (parseFloat(document.getElementById('fee_b').value) || 0) / 100, 
+                    mkt: parseFloat(document.getElementById('mkt_b').value) || 0,
+                    discount: (parseFloat(document.getElementById('discount_b').value) || 0) / 100
+                },
+                c: { // Kênh C (Owned Channel)
+                    fee: (parseFloat(document.getElementById('fee_c').value) || 0) / 100, 
+                    mkt: parseFloat(document.getElementById('mkt_c').value) || 0,
+                    discount: (parseFloat(document.getElementById('discount_c').value) || 0) / 100
+                },
+            };
+
+            const results = {};
+
+            // --- Vòng lặp tính toán cho từng Kịch Bản (A, B, C) ---
+            for (const key in scenarios) {
+                const s = scenarios[key];
+                
+                // 1. Giá bán thực tế sau khi áp dụng discount
+                const sellingPrice = listPrice * (1 - s.discount);
+
+                // 2. Tổng Chi Phí CỐ ĐỊNH/Đơn (Vốn + Vận Hành + MKT)
+                const totalCostBasis = cogs + fixedCost + s.mkt;
+
+                // 3. Tổng Tỷ Lệ Phí Biến Đổi (Phí Sàn/Hoa Hồng + Thuế)
+                const totalVariableFeeRate = s.fee + taxRate;
+                // Phí biến đổi (VNĐ) = Giá bán thực tế * Tổng tỷ lệ phí biến đổi
+                const variableFees = sellingPrice * totalVariableFeeRate;
+
+                // 4. Lãi Ròng Thực Tế (NET PROFIT)
+                // Lãi Ròng = Giá bán thực tế - Chi phí CỐ ĐỊNH - Phí BIẾN ĐỔI
+                const netProfit = sellingPrice - totalCostBasis - variableFees;
+
+                // 5. Tỷ lệ Lãi Ròng Thực Tế (%)
+                const netMargin = (netProfit / sellingPrice) * 100;
+
+                // 6. Giá Hoà Vốn (Break-Even Price - BEP)
+                // BEP = Total Cost Basis / (1 - Total Variable Fee Rate)
+                const bep = totalCostBasis / (1 - totalVariableFeeRate);
+
+                // 7. Giá Bán CẦN Đạt Lãi Ròng Mục Tiêu (Target Selling Price - TSP)
+                // TSP = Total Cost Basis / (1 - Total Variable Fee Rate - Target Margin Rate)
+                let tsp = NaN;
+                if ((1 - totalVariableFeeRate - targetMarginRate) > 0) {
+                    tsp = totalCostBasis / (1 - totalVariableFeeRate - targetMarginRate);
+                }
+
+
+                results[key] = {
+                    netProfit: netProfit,
+                    netMargin: netMargin,
+                    bep: bep,
+                    tsp: tsp,
+                    sellingPrice: sellingPrice
+                };
+
+                // Hiển thị kết quả vào Bảng
+                document.getElementById(`bep_${key}`).textContent = formatCurrency(bep);
+                document.getElementById(`tsp_${key}`).textContent = formatCurrency(tsp);
+                
+                // Hiển thị Lãi Ròng Thực Tế
+                const profitEl = document.getElementById(`net_profit_${key}`);
+                profitEl.textContent = formatCurrency(netProfit);
+                profitEl.classList.toggle('text-red-600', netProfit < 0);
+                profitEl.classList.toggle('text-green-700', netProfit >= 0);
+
+                // Hiển thị Tỷ lệ Lãi Ròng
+                document.getElementById(`net_margin_${key}`).textContent = `${netMargin.toFixed(1)}%`;
+            }
+
+            // --- Cập nhật Khu Vực 3: Quyết Định ---
+
+            // Giả định Kênh A (Shopee) là kênh tiêu chuẩn để so sánh Uplift
+            // Giả định Kênh C (Owned Channel) là kênh được quan tâm nhất cho Discount Tối Đa
+
+            // 1. LÃI RÒNG CHÊNH LỆCH (Uplift: Kênh C - Kênh A)
+            const profitUplift = results.c.netProfit - results.a.netProfit;
+            document.getElementById('profit_uplift').textContent = formatCurrency(profitUplift);
+            document.getElementById('profit_uplift').parentElement.classList.toggle('bg-red-50', profitUplift < 0);
+            document.getElementById('profit_uplift').parentElement.classList.toggle('bg-green-50', profitUplift > 0);
+            
+            // 2. Discount Tối Đa Cho Phép (Kênh C)
+            const maxDiscountValue = listPrice - results.c.tsp;
+            const maxDiscountPercent = (maxDiscountValue / listPrice) * 100;
+            
+            const discountCard = document.getElementById('discount_card_b');
+            
+            if (maxDiscountValue <= 0 || isNaN(maxDiscountValue)) {
+                // Phải bán cao hơn giá niêm yết để đạt target margin HOẶC không thể đạt target
+                discountCard.classList.remove('bg-green-50', 'border-green-300');
+                discountCard.classList.add('bg-red-100', 'border-red-400');
+                if (maxDiscountValue < 0) {
+                    document.getElementById('max_discount_b').textContent = `PHẢI TĂNG GIÁ! (${formatCurrency(-maxDiscountValue)})`;
+                } else {
+                    document.getElementById('max_discount_b').textContent = `KHÔNG ĐẠT LÃI KỲ VỌNG`;
+                }
+            } else {
+                const maxDiscountText = `${formatCurrency(maxDiscountValue)} (${maxDiscountPercent.toFixed(1)}%)`;
+                discountCard.classList.remove('bg-red-100', 'border-red-400');
+                discountCard.classList.add('bg-green-50', 'border-green-300');
+                document.getElementById('max_discount_b').textContent = maxDiscountText;
+            }
+            
+            // 3. Cảnh Báo Kịch Bản C
+            const lossAlertEl = document.getElementById('loss_alert');
+            const alertCard = document.getElementById('alert_card_c');
+            
+            if (results.c.netProfit < 0) {
+                lossAlertEl.textContent = 'LỖ NẶNG!';
+                lossAlertEl.classList.remove('text-red-600');
+                lossAlertEl.classList.add('text-white');
+                alertCard.classList.remove('bg-yellow-50', 'border-yellow-300');
+                alertCard.classList.add('bg-red-600', 'border-red-700');
+            } else {
+                lossAlertEl.textContent = 'CÓ LÃI';
+                lossAlertEl.classList.remove('text-white');
+                lossAlertEl.classList.add('text-green-700');
+                alertCard.classList.remove('bg-red-600', 'border-red-700');
+                alertCard.classList.add('bg-green-50', 'border-green-300');
+            }
+        };
+
+        // Chạy lần đầu khi tải trang
+        window.onload = function() {
+            calculateProfit();
+        };
+
+    </script>
+</body>
+</html>
